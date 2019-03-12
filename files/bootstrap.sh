@@ -47,7 +47,7 @@ client {
 }
 
 consul {
-  address = "$localhost:8500"
+  address = "localhost:8500"
 
   server_service_name = "nomad"
   client_service_name = "nomad-client"
