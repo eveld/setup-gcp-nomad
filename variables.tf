@@ -51,3 +51,8 @@ variable "client_instance_tag" {
   type    = string
   default = "nomad-client"
 }
+
+variable "whitelist" {
+    type = list(string)
+    default = []
+}

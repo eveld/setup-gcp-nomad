@@ -11,3 +11,5 @@ client_instance_type  = "e2-medium"
 client_instance_image = "nomad-104"
 client_instance_count = 3
 client_instance_tag   = "nomad-client"
+
+whitelist = ["213.127.71.65", "81.187.43.208"]
