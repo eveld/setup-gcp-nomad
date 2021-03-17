@@ -11,39 +11,28 @@ cat <<EOF > /etc/docker/config.json
 }
 EOF
 
-# Configure Consul.
-mkdir -p /etc/consul.d
-cat <<EOF > /etc/consul.d/server.hcl
-log_level = "DEBUG"
-data_dir = "/tmp/consul"
-
-server = true
-bootstrap_expect = 3
-retry_join = ["provider=gce tag_value=server"]
-
-bind_addr = "$IP"
-
-ui = true
-EOF
-
-systemctl restart consul
-
 # Configure Nomad.
 mkdir -p /etc/nomad.d
 cat <<EOF > /etc/nomad.d/server.hcl
 log_level = "DEBUG"
-data_dir = "/tmp/nomad"
+data_dir = "/etc/nomad.d/data"
 
 server {
   enabled = true
-  bootstrap_expect = 3
+  bootstrap_expect = ${SERVER_INSTANCE_COUNT}
+  server_join {
+    retry_join = ["provider=gce tag_value=${SERVER_INSTANCE_TAG}"]
+  }
 }
 
-client {
-  enabled = true
-  options {
-    "docker.auth.config" = "/etc/docker/config.json"
-  }
+autopilot {
+    cleanup_dead_servers      = true
+    last_contact_threshold    = "200ms"
+    max_trailing_logs         = 250
+    server_stabilization_time = "10s"
+    enable_redundancy_zones   = false
+    disable_upgrade_migration = false
+    enable_custom_upgrades    = false
 }
 
 consul {
@@ -60,4 +49,3 @@ consul {
 EOF
 
 systemctl restart nomad
-
